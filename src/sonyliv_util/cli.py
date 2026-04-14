@@ -125,14 +125,18 @@ def main():
     # Interactive selection
     print()
     while True:
-        choice = input("Enter match number (or 'a' for all, 'q' to quit): ").strip().lower()
+        try:
+            choice = input("Pick a match (number, 'a' for all, 'q' to quit): ").strip().lower()
+        except (EOFError, KeyboardInterrupt):
+            print()
+            break
 
         if choice == "q":
             break
         elif choice == "a":
             for home, away, _, best in match_list:
                 url = build_url(best["content_id"])
-                print(f"  Opening: {home} vs {away}")
+                print(f"  Opening: {home} vs {away}", flush=True)
                 open_in_browser(url)
             break
         else:
@@ -141,8 +145,9 @@ def main():
                 if 0 <= idx < len(match_list):
                     home, away, _, best = match_list[idx]
                     url = build_url(best["content_id"])
-                    print(f"  Opening: {home} vs {away}")
+                    print(f"\n  Opening: {home} vs {away}", flush=True)
                     open_in_browser(url)
+                    print()
                 else:
                     print(f"  Invalid number. Choose 1-{len(match_list)}.")
             except ValueError:

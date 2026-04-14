@@ -16,7 +16,7 @@ SonyLiv highlights the winning team in video thumbnails, spoiling the result bef
 
 ## Setup
 
-Requires [uv](https://docs.astral.sh/uv/) and macOS.
+Requires [uv](https://docs.astral.sh/uv/). Works on macOS, Windows, and Linux.
 
 ```bash
 # Clone and install
@@ -56,9 +56,15 @@ Enter match number (or 'a' for all, 'q' to quit): 1
 All settings are in `config.toml` at the project root:
 
 ```toml
+[platform]
+# Operating system: "macos", "windows", or "linux"
+os = "macos"
+
 [browser]
-# Application name passed to `open -a` on macOS.
-# Examples: "Google Chrome", "Firefox", "Safari", "Arc"
+# Browser to open videos in.
+#   macOS:   application name for `open -a` (e.g. "Google Chrome", "Firefox", "Safari", "Arc")
+#   Windows: executable name or path (e.g. "chrome", "firefox", "msedge")
+#   Linux:   executable name or path (e.g. "google-chrome", "firefox"). Leave empty to use xdg-open.
 name = "Google Chrome"
 
 [sonyliv]
@@ -94,7 +100,7 @@ tests/
 ## Requirements
 
 - [uv](https://docs.astral.sh/uv/) (handles Python installation automatically)
-- macOS (uses `open -a` to launch the browser)
+- macOS, Windows, or Linux (set `platform.os` in `config.toml`)
 - A browser with an active SonyLiv subscription logged in
 - Network access to `apiv2.sonyliv.com`
 

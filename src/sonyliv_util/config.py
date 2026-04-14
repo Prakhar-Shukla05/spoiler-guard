@@ -8,6 +8,9 @@ import tomllib
 from pathlib import Path
 
 _DEFAULTS = {
+    "platform": {
+        "os": "macos",
+    },
     "browser": {
         "name": "Google Chrome",
     },
@@ -34,9 +37,9 @@ def _find_config_path():
 
 def load_config():
     """Load configuration from config.toml, merged with defaults."""
-    config = {
-        section: dict(values) for section, values in _DEFAULTS.items()
-    }
+    config = {}
+    for key, value in _DEFAULTS.items():
+        config[key] = dict(value) if isinstance(value, dict) else value
 
     path = _find_config_path()
     if path is None:
@@ -45,17 +48,20 @@ def load_config():
     with open(path, "rb") as f:
         user_config = tomllib.load(f)
 
-    for section, values in user_config.items():
-        if section in config:
-            config[section].update(values)
+    for key, value in user_config.items():
+        if key in config and isinstance(config[key], dict) and isinstance(value, dict):
+            config[key].update(value)
         else:
-            config[section] = values
+            config[key] = value
 
     return config
 
 
 # Module-level config — loaded once on import.
 _config = load_config()
+
+# Platform
+PLATFORM = _config["platform"]["os"]
 
 # Browser
 BROWSER_NAME = _config["browser"]["name"]

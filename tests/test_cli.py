@@ -26,8 +26,9 @@ class TestFormatDuration:
 
 
 class TestOpenInBrowser:
-    def test_calls_open_with_configured_browser(self):
+    def test_macos_calls_open_a(self):
         with (
+            patch("sonyliv_util.cli.PLATFORM", "macos"),
             patch("sonyliv_util.cli.BROWSER_NAME", "Firefox"),
             patch("sonyliv_util.cli.subprocess.run") as mock_run,
         ):
@@ -36,6 +37,52 @@ class TestOpenInBrowser:
                 ["open", "-a", "Firefox", "https://example.com"],
                 check=True,
             )
+
+    def test_windows_calls_cmd_start(self):
+        with (
+            patch("sonyliv_util.cli.PLATFORM", "windows"),
+            patch("sonyliv_util.cli.BROWSER_NAME", "chrome"),
+            patch("sonyliv_util.cli.subprocess.run") as mock_run,
+        ):
+            open_in_browser("https://example.com")
+            mock_run.assert_called_once_with(
+                ["cmd", "/c", "start", "", "chrome", "https://example.com"],
+                check=True,
+            )
+
+    def test_linux_calls_browser_directly(self):
+        with (
+            patch("sonyliv_util.cli.PLATFORM", "linux"),
+            patch("sonyliv_util.cli.BROWSER_NAME", "google-chrome"),
+            patch("sonyliv_util.cli.subprocess.run") as mock_run,
+        ):
+            open_in_browser("https://example.com")
+            mock_run.assert_called_once_with(
+                ["google-chrome", "https://example.com"],
+                check=True,
+            )
+
+    def test_linux_falls_back_to_xdg_open(self):
+        with (
+            patch("sonyliv_util.cli.PLATFORM", "linux"),
+            patch("sonyliv_util.cli.BROWSER_NAME", ""),
+            patch("sonyliv_util.cli.subprocess.run") as mock_run,
+        ):
+            open_in_browser("https://example.com")
+            mock_run.assert_called_once_with(
+                ["xdg-open", "https://example.com"],
+                check=True,
+            )
+
+    def test_unknown_platform_uses_webbrowser(self):
+        with (
+            patch("sonyliv_util.cli.PLATFORM", "freebsd"),
+            patch("sonyliv_util.cli.subprocess.run") as mock_run,
+            patch("sonyliv_util.cli.webbrowser.open") as mock_wb,
+        ):
+            open_in_browser("https://example.com")
+            mock_run.assert_not_called()
+            mock_wb.assert_called_once_with("https://example.com")
 
     def test_falls_back_to_webbrowser_on_error(self):
         with (

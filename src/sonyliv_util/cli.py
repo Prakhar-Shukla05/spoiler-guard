@@ -7,7 +7,7 @@ import webbrowser
 from datetime import datetime, timedelta, timezone
 
 from .api import fetch_ucl_content, get_token
-from .config import BROWSER_NAME
+from .config import BROWSER_NAME, PLATFORM
 from .match import (
     build_url,
     find_matches,
@@ -36,12 +36,19 @@ def format_duration(seconds):
 
 
 def open_in_browser(url):
-    """Open URL in the configured browser on macOS."""
+    """Open URL in the configured browser on the configured platform."""
     try:
-        subprocess.run(
-            ["open", "-a", BROWSER_NAME, url],
-            check=True,
-        )
+        if PLATFORM == "macos":
+            subprocess.run(["open", "-a", BROWSER_NAME, url], check=True)
+        elif PLATFORM == "windows":
+            subprocess.run(["cmd", "/c", "start", "", BROWSER_NAME, url], check=True)
+        elif PLATFORM == "linux":
+            if BROWSER_NAME:
+                subprocess.run([BROWSER_NAME, url], check=True)
+            else:
+                subprocess.run(["xdg-open", url], check=True)
+        else:
+            webbrowser.open(url)
     except (subprocess.CalledProcessError, FileNotFoundError):
         webbrowser.open(url)
 

@@ -1,6 +1,12 @@
+[platform]
+# Operating system: "macos", "windows", or "linux"
+os = "macos"
+
 [browser]
-# Application name passed to `open -a` on macOS.
-# Examples: "Google Chrome", "Firefox", "Safari", "Arc"
+# Browser to open videos in.
+#   macOS:   application name for `open -a` (e.g. "Google Chrome", "Firefox", "Safari", "Arc")
+#   Windows: executable name or path (e.g. "chrome", "firefox", "msedge")
+#   Linux:   executable name or path (e.g. "google-chrome", "firefox"). Leave empty to use xdg-open.
 name = "Google Chrome"
 
 [sonyliv]

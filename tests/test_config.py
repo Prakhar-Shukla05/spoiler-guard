@@ -12,6 +12,7 @@ class TestLoadConfig:
         with patch("sonyliv_util.config._find_config_path", return_value=None):
             config = load_config()
 
+        assert config["platform"]["os"] == "macos"
         assert config["browser"]["name"] == "Google Chrome"
         assert config["sonyliv"]["tournament_id"] == "1700000773"
         assert config["sonyliv"]["season"] == "2025-26"
@@ -54,6 +55,8 @@ name = "Safari"
         assert config["preferences"]["favourite_teams"] == ["chelsea"]
 
     def test_defaults_contain_all_required_keys(self):
+        assert "platform" in _DEFAULTS
+        assert "os" in _DEFAULTS["platform"]
         assert "browser" in _DEFAULTS
         assert "name" in _DEFAULTS["browser"]
         assert "sonyliv" in _DEFAULTS

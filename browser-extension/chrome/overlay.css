@@ -1,0 +1,18 @@
+/*
+ * Spoiler Guard — injected at document_start on sonyliv.com.
+ *
+ * Hides anything that could reveal the match result:
+ * - The HTML5 <video> poster attribute (rendered as a background)
+ * - Player poster/thumbnail overlays (Bitmovin or custom)
+ * - Any element with poster/thumbnail in its class name
+ */
+
+video[poster] {
+  background: #000 !important;
+}
+
+.bmpui-ui-poster,
+[class*="poster" i],
+[class*="thumbnail" i] {
+  visibility: hidden !important;
+}

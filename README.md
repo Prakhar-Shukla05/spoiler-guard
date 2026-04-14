@@ -30,6 +30,15 @@ uv run sonyliv
 uv run sonyliv --date 2026-04-09
 ```
 
+### Browser extension (optional, recommended)
+
+SonyLiv flashes the match thumbnail while the video buffers. The included Chrome extension hides poster and thumbnail elements so the result is never visible.
+
+1. Open `chrome://extensions` in Chrome
+2. Enable **Developer mode** (top right)
+3. Click **Load unpacked** and select the `browser-extension/chrome/` directory
+4. Done — the extension activates automatically on SonyLiv pages opened with `?watch=true`
+
 ## Usage
 
 ```
@@ -84,6 +93,10 @@ favourite_teams = ["chelsea"]
 
 ```
 config.toml                # All user-configurable settings
+browser-extension/chrome/
+  manifest.json  # Chrome extension manifest (Manifest V3)
+  content.js     # Strips video poster attributes via MutationObserver
+  overlay.css    # Hides poster and thumbnail elements
 src/spoiler_guard/
   __init__.py
   config.py    # Loads config.toml, provides module-level constants
@@ -109,4 +122,4 @@ tests/
 - The API returns at most 50 items per page. The tool paginates up to 10 pages (500 items) to find older matches, but very old content may still be unreachable.
 - The `objectSubtype` API filter only works reliably for `HIGHLIGHTS`. Other subtypes (`FULL_MATCH`, `SPORTS_CLIPS`) are filtered client-side from unfiltered results.
 - Season-specific: update `tournament_id` and `season` in `config.toml` when a new UCL season starts.
-- SonyLiv flashes the match thumbnail while the video buffers, even with `?watch=true` — this can spoil the result. Look away until you hear audio.
+- SonyLiv briefly flashes the match thumbnail while the video buffers — this can spoil the result. Install the included browser extension (see [Setup](#browser-extension-optional-recommended)) to hide thumbnails automatically.

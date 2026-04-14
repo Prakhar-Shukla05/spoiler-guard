@@ -34,22 +34,25 @@ def get_token():
     return data["resultObj"]
 
 
-def fetch_ucl_content(token, subtype=None, count=50):
-    """Fetch recent UCL content, optionally filtered by subtype.
+def fetch_ucl_content(token, subtype=None, count=50, offset=0):
+    """Fetch UCL content with pagination support.
 
-    The API caps responses at 50 items. The objectSubtype filter only works
-    reliably for "HIGHLIGHTS" — other values return unfiltered results.
+    The API caps responses at 50 items per page. The objectSubtype filter
+    only works reliably for "HIGHLIGHTS" — other values return unfiltered
+    results.
 
     Args:
         token: Anonymous session token from get_token().
         subtype: Optional content subtype filter (e.g. "HIGHLIGHTS").
-        count: Number of items to fetch (max 50).
+        count: Number of items to fetch (max 50 per page).
+        offset: Starting index for pagination.
     """
+    page_size = min(count, 50)
     params = {
         "filter_parentId": TOURNAMENT_ID,
         "filter_contentType": "VOD",
-        "from": "0",
-        "to": str(min(count, 50) - 1),
+        "from": str(offset),
+        "to": str(offset + page_size - 1),
         "sortOrder": "desc",
         "orderBy": "creationDate",
     }

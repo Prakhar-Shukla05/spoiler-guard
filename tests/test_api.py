@@ -112,6 +112,15 @@ class TestFetchUclContent:
             called_req = mock_open.call_args[0][0]
             assert f"filter_parentId={TOURNAMENT_ID}" in called_req.full_url
 
+    def test_passes_offset_to_from_and_to(self):
+        mock_resp = _mock_urlopen({"resultObj": {"containers": []}})
+        with patch("sonyliv_util.api.urlopen", return_value=mock_resp) as mock_open:
+            fetch_ucl_content("token", count=50, offset=100)
+
+            called_req = mock_open.call_args[0][0]
+            assert "from=100" in called_req.full_url
+            assert "to=149" in called_req.full_url
+
     def test_returns_empty_list_on_missing_containers(self):
         mock_resp = _mock_urlopen({"resultObj": {}})
         with patch("sonyliv_util.api.urlopen", return_value=mock_resp):

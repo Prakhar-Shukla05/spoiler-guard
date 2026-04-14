@@ -85,10 +85,10 @@ src/sonyliv_util/
   match.py     # Match parsing, content selection, URL building
   cli.py       # CLI entry point and interactive UI
 tests/
-  test_config.py
   test_api.py
-  test_match.py
   test_cli.py
+  test_config.py
+  test_match.py
 ```
 
 ## Requirements
@@ -100,6 +100,6 @@ tests/
 
 ## Limitations
 
-- The API returns at most 50 items per request. If SonyLiv publishes more than 50 content items between matchdays, older matches may not appear. Use `--date` to target specific dates.
+- The API returns at most 50 items per page. The tool paginates up to 10 pages (500 items) to find older matches, but very old content may still be unreachable.
 - The `objectSubtype` API filter only works reliably for `HIGHLIGHTS`. Other subtypes (`FULL_MATCH`, `SPORTS_CLIPS`) are filtered client-side from unfiltered results.
 - Season-specific: update `tournament_id` and `season` in `config.toml` when a new UCL season starts.

@@ -77,28 +77,44 @@ def main():
         print(f"Failed to get SonyLiv token: {e}")
         sys.exit(1)
 
-    # Fetch content — the API caps at 50 items per request and the
-    # objectSubtype filter only works reliably for HIGHLIGHTS. Fetch both
-    # filtered highlights and unfiltered recent content to catch FULL_MATCH
-    # items which have a distinct objectSubtype in the response metadata.
+    # Fetch content with pagination. The API returns 50 items per page and
+    # the objectSubtype filter only works reliably for HIGHLIGHTS. Fetch
+    # both filtered highlights and unfiltered content (for FULL_MATCH),
+    # paginating until we find matches for the target date or exhaust
+    # a reasonable search depth.
+    MAX_PAGES = 10
+    PAGE_SIZE = 50
+
+    seen_ids = set()
+    combined = []
+    matches = {}
+
     try:
-        highlights = fetch_ucl_content(token, subtype="HIGHLIGHTS", count=50)
-        all_recent = fetch_ucl_content(token, subtype=None, count=50)
+        for page in range(MAX_PAGES):
+            offset = page * PAGE_SIZE
+            highlights = fetch_ucl_content(
+                token, subtype="HIGHLIGHTS", count=PAGE_SIZE, offset=offset,
+            )
+            all_recent = fetch_ucl_content(
+                token, subtype=None, count=PAGE_SIZE, offset=offset,
+            )
+
+            new_items = 0
+            for item in highlights + all_recent:
+                cid = item.get("id")
+                if cid not in seen_ids:
+                    seen_ids.add(cid)
+                    combined.append(item)
+                    new_items += 1
+
+            matches = find_matches(combined, target_date)
+
+            if matches or new_items == 0:
+                break
+
     except Exception as e:
         print(f"Failed to fetch content: {e}")
         sys.exit(1)
-
-    # Merge and deduplicate by content ID
-    seen_ids = set()
-    combined = []
-    for item in highlights + all_recent:
-        cid = item.get("id")
-        if cid not in seen_ids:
-            seen_ids.add(cid)
-            combined.append(item)
-
-    # Group by match and date
-    matches = find_matches(combined, target_date)
 
     # Select best content per match
     match_list = []

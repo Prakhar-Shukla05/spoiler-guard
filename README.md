@@ -109,3 +109,4 @@ tests/
 - The API returns at most 50 items per page. The tool paginates up to 10 pages (500 items) to find older matches, but very old content may still be unreachable.
 - The `objectSubtype` API filter only works reliably for `HIGHLIGHTS`. Other subtypes (`FULL_MATCH`, `SPORTS_CLIPS`) are filtered client-side from unfiltered results.
 - Season-specific: update `tournament_id` and `season` in `config.toml` when a new UCL season starts.
+- SonyLiv flashes the match thumbnail while the video buffers, even with `?watch=true` — this can spoil the result. Look away until you hear audio.

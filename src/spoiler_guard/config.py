@@ -1,4 +1,4 @@
-"""Configuration loader for sonyliv-util.
+"""Configuration loader for spoiler-guard.
 
 Reads config.toml from the project root. Falls back to defaults if the
 file is missing or a key is absent.

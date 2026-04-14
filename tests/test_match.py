@@ -2,7 +2,7 @@
 
 from datetime import date
 
-from sonyliv_util.match import (
+from spoiler_guard.match import (
     build_url,
     find_matches,
     is_favourite_team_match,

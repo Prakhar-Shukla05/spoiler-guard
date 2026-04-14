@@ -1,4 +1,4 @@
-# sonyliv-util
+# spoiler-guard
 
 Spoiler-free Champions League highlights launcher for [SonyLiv](https://www.sonyliv.com/).
 
@@ -20,7 +20,7 @@ Requires [uv](https://docs.astral.sh/uv/). Works on macOS, Windows, and Linux.
 
 ```bash
 # Clone and install
-git clone <repo-url> && cd sonyLivUtil
+git clone <repo-url> && cd spoiler-guard
 uv sync
 
 # Run
@@ -84,7 +84,7 @@ favourite_teams = ["chelsea"]
 
 ```
 config.toml                # All user-configurable settings
-src/sonyliv_util/
+src/spoiler_guard/
   __init__.py
   config.py    # Loads config.toml, provides module-level constants
   api.py       # SonyLiv API client (token, content listing)

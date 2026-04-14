@@ -4,12 +4,12 @@ import tomllib
 from pathlib import Path
 from unittest.mock import mock_open, patch
 
-from sonyliv_util.config import _DEFAULTS, load_config
+from spoiler_guard.config import _DEFAULTS, load_config
 
 
 class TestLoadConfig:
     def test_returns_defaults_when_no_config_file(self):
-        with patch("sonyliv_util.config._find_config_path", return_value=None):
+        with patch("spoiler_guard.config._find_config_path", return_value=None):
             config = load_config()
 
         assert config["platform"]["os"] == "macos"
@@ -28,7 +28,7 @@ favourite_teams = ["arsenal", "chelsea"]
 """
         fake_path = Path("/fake/config.toml")
         with (
-            patch("sonyliv_util.config._find_config_path", return_value=fake_path),
+            patch("spoiler_guard.config._find_config_path", return_value=fake_path),
             patch("builtins.open", mock_open(read_data=toml_content)),
         ):
             config = load_config()
@@ -45,7 +45,7 @@ name = "Safari"
 """
         fake_path = Path("/fake/config.toml")
         with (
-            patch("sonyliv_util.config._find_config_path", return_value=fake_path),
+            patch("spoiler_guard.config._find_config_path", return_value=fake_path),
             patch("builtins.open", mock_open(read_data=toml_content)),
         ):
             config = load_config()

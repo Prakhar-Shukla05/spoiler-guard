@@ -32,9 +32,11 @@ uv run sonyliv --date 2026-04-09
 
 ### Browser extension (optional, recommended)
 
-SonyLiv flashes the match thumbnail while the video buffers. The included Chrome extension hides poster and thumbnail elements so the result is never visible.
+SonyLiv flashes the match thumbnail while the video buffers. The included browser extension hides poster and thumbnail elements so the result is never visible. It works on Chrome and any Chromium-based browser (Edge, Arc, Brave, Opera, etc.).
 
-1. Open `chrome://extensions` in Chrome
+**Chrome / Edge / Arc / Brave / Opera:**
+
+1. Open `chrome://extensions` (or `edge://extensions` for Edge)
 2. Enable **Developer mode** (top right)
 3. Click **Load unpacked** and select the `browser-extension/chrome/` directory
 4. Done — the extension activates automatically on SonyLiv pages opened with `?watch=true`

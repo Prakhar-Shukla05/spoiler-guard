@@ -1,0 +1,16 @@
+[browser]
+# Application name passed to `open -a` on macOS.
+# Examples: "Google Chrome", "Firefox", "Safari", "Arc"
+name = "Google Chrome"
+
+[sonyliv]
+# SonyLiv's internal tournament ID for the UCL season.
+# Update this when a new season starts.
+tournament_id = "1700000773"
+
+# Season string used in the SonyLiv URL path.
+season = "2025-26"
+
+[preferences]
+# Teams for which a full match replay is preferred over highlights.
+favourite_teams = ["chelsea"]

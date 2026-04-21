@@ -41,6 +41,13 @@ SonyLiv flashes the match thumbnail while the video buffers. The included browse
 3. Click **Load unpacked** and select the `browser-extension/chrome/` directory
 4. Done — the extension activates automatically on SonyLiv pages opened with `?watch=true`
 
+**Firefox:**
+
+1. Open `about:debugging#/runtime/this-firefox`
+2. Click **Load Temporary Add-on...**
+3. Select the `browser-extension/firefox/manifest.json` file
+4. Done — same activation as above
+
 ## Usage
 
 ```
@@ -95,10 +102,15 @@ favourite_teams = ["chelsea"]
 
 ```
 config.toml                # All user-configurable settings
-browser-extension/chrome/
-  manifest.json  # Chrome extension manifest (Manifest V3)
-  content.js     # Strips video poster attributes via MutationObserver
-  overlay.css    # Hides poster and thumbnail elements
+browser-extension/
+  chrome/
+    manifest.json  # Chrome/Chromium extension manifest (Manifest V3)
+    content.js     # Strips video poster attributes via MutationObserver
+    overlay.css    # Hides poster and thumbnail elements
+  firefox/
+    manifest.json  # Firefox manifest with gecko ID
+    content.js     # → symlink to chrome/content.js
+    overlay.css    # → symlink to chrome/overlay.css
 src/spoiler_guard/
   __init__.py
   config.py    # Loads config.toml, provides module-level constants

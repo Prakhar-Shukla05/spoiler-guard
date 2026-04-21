@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "Spoiler Guard",
+  "version": "0.1.0",
+  "description": "Hides SonyLiv video thumbnails to prevent match result spoilers",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "spoiler-guard@spoiler-guard"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://*.sonyliv.com/*"],
+      "js": ["content.js"],
+      "css": ["overlay.css"],
+      "run_at": "document_start"
+    }
+  ],
+  "icons": {},
+  "permissions": []
+}

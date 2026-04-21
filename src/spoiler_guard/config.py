@@ -21,6 +21,10 @@ _DEFAULTS = {
     "preferences": {
         "favourite_teams": ["chelsea"],
     },
+    "hotstar": {
+        "tray_id": "1271442198",
+        "user_token": "",
+    },
 }
 
 
@@ -72,3 +76,7 @@ SEASON = _config["sonyliv"]["season"]
 
 # Preferences
 FAVOURITE_TEAMS = _config["preferences"]["favourite_teams"]
+
+# Hotstar
+HOTSTAR_TRAY_ID = _config["hotstar"]["tray_id"]
+HOTSTAR_USER_TOKEN = _config["hotstar"]["user_token"]

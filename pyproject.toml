@@ -9,6 +9,7 @@ dependencies = []
 
 [project.scripts]
 sonyliv = "spoiler_guard.cli:main"
+hotstar = "spoiler_guard.hotstar_cli:main"
 
 [build-system]
 requires = ["hatchling"]

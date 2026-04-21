@@ -1,11 +1,19 @@
 /*
- * Spoiler Guard — injected at document_start on sonyliv.com.
+ * Spoiler Guard — injected at document_start on SonyLiv and Hotstar.
  *
  * Hides anything that could reveal the match result:
  * - The HTML5 <video> poster attribute (rendered as a background)
  * - Player poster/thumbnail overlays (Bitmovin or custom)
  * - Any element with poster/thumbnail in its class name
+ *
+ * Hotstar score hiding is handled by content.js (regex-based)
+ * rather than CSS, to avoid hiding player controls.
+ *
+ * Hotstar sports: hides seekbar, scrubber, and time display so
+ * remaining time doesn't spoil the outcome.
  */
+
+/* --- Shared: poster and thumbnail hiding --- */
 
 video[poster] {
   background: #000 !important;
@@ -14,5 +22,13 @@ video[poster] {
 .bmpui-ui-poster,
 [class*="poster" i],
 [class*="thumbnail" i] {
+  visibility: hidden !important;
+}
+
+/* --- Hotstar sports: hide seekbar and time --- */
+
+.sg-hotstar-sports [class*="SEEKBAR_TRACK" i],
+.sg-hotstar-sports [class*="SEEKBAR_HIGHLIGHT" i],
+.sg-hotstar-sports [aria-label="Current position"] {
   visibility: hidden !important;
 }

@@ -1,0 +1,32 @@
+[platform]
+# Operating system: "macos", "windows", or "linux"
+os = "macos"
+
+[browser]
+# Browser to open videos in.
+#   macOS:   application name for `open -a` (e.g. "Google Chrome", "Firefox", "Safari", "Arc")
+#   Windows: executable name or path (e.g. "chrome", "firefox", "msedge")
+#   Linux:   executable name or path (e.g. "google-chrome", "firefox"). Leave empty to use xdg-open.
+name = "Google Chrome"
+
+[sonyliv]
+# SonyLiv's internal tournament ID for the UCL season.
+# Update this when a new season starts.
+tournament_id = "1700000773"
+
+# Season string used in the SonyLiv URL path.
+season = "2025-26"
+
+[preferences]
+# Teams for which a full match replay is preferred over highlights.
+favourite_teams = ["chelsea"]
+
+[hotstar]
+# Hotstar tray ID for PL 2025-26 replays.
+# Update this when a new season starts.
+tray_id = "1271442198"
+
+# Your Hotstar userUP cookie value. Required for API access.
+# To find it: open hotstar.com in your browser, log in, open DevTools (F12),
+# go to Application > Cookies > hotstar.com, copy the value of "userUP".
+user_token = ""

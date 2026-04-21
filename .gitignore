@@ -11,3 +11,6 @@ wheels/
 
 # IDE
 .idea/
+
+# Config contains auth tokens — use config.toml.example as template
+config.toml

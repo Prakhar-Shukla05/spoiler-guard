@@ -1,10 +1,12 @@
 # spoiler-guard
 
-Spoiler-free Champions League highlights launcher for [SonyLiv](https://www.sonyliv.com/).
+Spoiler-free sports highlights launcher for [SonyLiv](https://www.sonyliv.com/) (Champions League) and [Hotstar](https://www.hotstar.com/) (Premier League).
 
-SonyLiv highlights the winning team in video thumbnails, spoiling the result before you can watch. This tool queries the SonyLiv API, presents matches with just team names (no scores, no thumbnails), and opens your selection directly in your browser with autoplay enabled — so you never see the spoiler thumbnail.
+Both platforms spoil match results through thumbnails and titles before you can watch. This tool queries their APIs, presents matches with just team names (no scores, no thumbnails), and opens your selection directly in your browser — so you never see the result.
 
 ## How it works
+
+### SonyLiv (Champions League)
 
 1. Fetches an anonymous browsing token from SonyLiv's public API
 2. Queries recent UCL content sorted by date
@@ -14,6 +16,15 @@ SonyLiv highlights the winning team in video thumbnails, spoiling the result bef
 4. Displays a spoiler-free list showing only team names and content type
 5. Opens your selection in the configured browser with `?watch=true` to auto-start playback
 
+### Hotstar (Premier League)
+
+1. Authenticates with Hotstar's API using your `userUP` cookie
+2. Fetches PL replays from the editorial tray, then enriches each match with highlights from the match detail API
+3. Filters to the last 2 days (today + yesterday IST)
+4. Displays a spoiler-free match list — team names only, no scores
+5. Two-level selection: pick a match, then choose between highlights and full match replay
+6. Opens your selection in the configured browser
+
 ## Setup
 
 Requires [uv](https://docs.astral.sh/uv/). Works on macOS, Windows, and Linux.
@@ -21,25 +32,31 @@ Requires [uv](https://docs.astral.sh/uv/). Works on macOS, Windows, and Linux.
 ```bash
 # Clone and install
 git clone <repo-url> && cd spoiler-guard
+cp config.toml.example config.toml
 uv sync
-
-# Run
-uv run sonyliv
-
-# Or with a specific date
-uv run sonyliv --date 2026-04-09
 ```
+
+### Hotstar authentication
+
+Hotstar requires your `userUP` cookie for API access:
+
+1. Open [hotstar.com](https://www.hotstar.com/) in your browser and log in
+2. Open DevTools (F12) → Application → Cookies → `hotstar.com`
+3. Copy the value of the `userUP` cookie
+4. Paste it into `config.toml` under `[hotstar] user_token`
+
+SonyLiv requires no authentication — it uses anonymous API tokens.
 
 ### Browser extension (optional, recommended)
 
-SonyLiv flashes the match thumbnail while the video buffers. The included browser extension hides poster and thumbnail elements so the result is never visible. It works on Chrome and any Chromium-based browser (Edge, Arc, Brave, Opera, etc.).
+The included browser extension hides spoiler thumbnails, match scores in titles, and the seekbar/time display on sports pages. It works on both SonyLiv and Hotstar.
 
 **Chrome / Edge / Arc / Brave / Opera:**
 
 1. Open `chrome://extensions` (or `edge://extensions` for Edge)
 2. Enable **Developer mode** (top right)
 3. Click **Load unpacked** and select the `browser-extension/chrome/` directory
-4. Done — the extension activates automatically on SonyLiv pages opened with `?watch=true`
+4. Done — the extension activates on SonyLiv (`?watch=true` URLs) and Hotstar (`/sports/` pages)
 
 **Firefox:**
 
@@ -50,6 +67,8 @@ SonyLiv flashes the match thumbnail while the video buffers. The included browse
 
 ## Usage
 
+### SonyLiv
+
 ```
 $ uv run sonyliv --date 2026-04-09
 Looking for UCL matches on 09 Apr 2026...
@@ -59,81 +78,108 @@ Found 2 match(es):
   1. PSG vs Liverpool — Extended Highlights (24m 51s)
   2. Barcelona vs Atletico — Extended Highlights (25m 52s)
 
-Enter match number (or 'a' for all, 'q' to quit): 1
+Pick a match (number, 'a' for all, 'q' to quit): 1
   Opening: PSG vs Liverpool
+```
+
+### Hotstar
+
+```
+$ uv run hotstar
+Looking for PL matches (20 Apr – 21 Apr 2026)...
+
+Found 4 match(es), fetching highlights...
+
+  1. Manchester City vs Arsenal
+  2. Everton vs Liverpool
+  3. Aston Villa vs Sunderland
+  4. Nottingham Forest vs Burnley
+
+Pick a match (number, 'a' for all, 'q' to quit): 1
+
+  Manchester City vs Arsenal:
+    1. Highlights (7m 10s)
+    2. Full Match Replay (2h 14m)
+
+  Pick content (number, or 'b' to go back): 2
+  Opening: Manchester City vs Arsenal — Full Match Replay
 ```
 
 ### Options
 
 | Flag | Description | Default |
 |------|-------------|---------|
-| `--date YYYY-MM-DD` | Match date to look up | Yesterday (IST) |
+| `--date YYYY-MM-DD` | Match date to look up | Today (IST) for SonyLiv; today + yesterday for Hotstar |
 
 ## Configuration
 
-All settings are in `config.toml` at the project root:
+Copy `config.toml.example` to `config.toml` and edit. The file is gitignored since it contains the Hotstar auth token.
 
 ```toml
 [platform]
-# Operating system: "macos", "windows", or "linux"
 os = "macos"
 
 [browser]
-# Browser to open videos in.
-#   macOS:   application name for `open -a` (e.g. "Google Chrome", "Firefox", "Safari", "Arc")
-#   Windows: executable name or path (e.g. "chrome", "firefox", "msedge")
-#   Linux:   executable name or path (e.g. "google-chrome", "firefox"). Leave empty to use xdg-open.
 name = "Google Chrome"
 
 [sonyliv]
-# SonyLiv's internal tournament ID for the UCL season.
-# Update this when a new season starts.
 tournament_id = "1700000773"
-
-# Season string used in the SonyLiv URL path.
 season = "2025-26"
 
 [preferences]
-# Teams for which a full match replay is preferred over highlights.
 favourite_teams = ["chelsea"]
+
+[hotstar]
+tray_id = "1271442198"
+user_token = ""  # Your Hotstar userUP cookie value
 ```
 
 ## Project structure
 
 ```
-config.toml                # All user-configurable settings
+config.toml.example        # Template config (copy to config.toml)
 browser-extension/
   chrome/
     manifest.json  # Chrome/Chromium extension manifest (Manifest V3)
-    content.js     # Strips video poster attributes via MutationObserver
-    overlay.css    # Hides poster and thumbnail elements
+    content.js     # Hides spoiler elements on SonyLiv and Hotstar
+    overlay.css    # CSS rules for poster, thumbnail, seekbar hiding
   firefox/
     manifest.json  # Firefox manifest with gecko ID
     content.js     # → symlink to chrome/content.js
     overlay.css    # → symlink to chrome/overlay.css
 src/spoiler_guard/
   __init__.py
-  config.py    # Loads config.toml, provides module-level constants
-  api.py       # SonyLiv API client (token, content listing)
-  match.py     # Match parsing, content selection, URL building
-  cli.py       # CLI entry point and interactive UI
+  common.py      # Shared utilities (IST, format_duration, open_in_browser)
+  config.py      # Loads config.toml, provides module-level constants
+  api.py         # SonyLiv API client (token, content listing)
+  match.py       # SonyLiv match parsing, content selection, URL building
+  cli.py         # SonyLiv CLI entry point (uv run sonyliv)
+  hotstar_api.py     # Hotstar API client (HMAC auth, tray/match fetching)
+  hotstar_match.py   # Hotstar match parsing, score stripping, grouping
+  hotstar_cli.py     # Hotstar CLI entry point (uv run hotstar)
 tests/
-  test_api.py
-  test_cli.py
-  test_config.py
-  test_match.py
+  test_common.py, test_config.py
+  test_api.py, test_match.py, test_cli.py
+  test_hotstar_api.py, test_hotstar_match.py, test_hotstar_cli.py
 ```
 
 ## Requirements
 
 - [uv](https://docs.astral.sh/uv/) (handles Python installation automatically)
 - macOS, Windows, or Linux (set `platform.os` in `config.toml`)
-- A browser with an active SonyLiv subscription logged in
-- Network access to `apiv2.sonyliv.com`
+- A browser with active SonyLiv and/or Hotstar subscriptions logged in
+- Network access to `apiv2.sonyliv.com` and/or `api.hotstar.com`
 
 ## Limitations
 
+### SonyLiv
 - The API returns at most 50 items per page. The tool paginates up to 10 pages (500 items) to find older matches, but very old content may still be unreachable.
 - The `objectSubtype` API filter only works reliably for `HIGHLIGHTS`. Other subtypes (`FULL_MATCH`, `SPORTS_CLIPS`) are filtered client-side from unfiltered results.
 - Season-specific: update `tournament_id` and `season` in `config.toml` when a new UCL season starts.
-- SonyLiv briefly flashes the match thumbnail while the video buffers — this can spoil the result. Install the included browser extension (see [Setup](#browser-extension-optional-recommended)) to hide thumbnails automatically.
+- SonyLiv briefly flashes the match thumbnail while the video buffers — install the browser extension to hide it.
+
+### Hotstar
+- Requires a valid `userUP` cookie which expires periodically — you'll need to re-copy it from DevTools when it does.
+- Hotstar's client-side router rewrites the URL to include the match score (e.g. `/crystal-palace-0-0-west-ham/`). The extension hides the score on the page itself, but the address bar may still show it.
+- The replay tray only contains recent matches. Older content may not be available.
+- Season-specific: update `tray_id` in `config.toml` when a new PL season starts.

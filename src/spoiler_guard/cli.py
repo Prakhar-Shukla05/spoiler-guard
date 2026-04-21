@@ -73,7 +73,7 @@ def main():
             sys.exit(1)
     else:
         now_ist = datetime.now(IST)
-        target_date = (now_ist - timedelta(days=1)).date()
+        target_date = now_ist.date()
 
     print(f"Looking for UCL matches on {target_date.strftime('%d %b %Y')}...\n")
 

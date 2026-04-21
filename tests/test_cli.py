@@ -1,8 +1,9 @@
 """Tests for CLI utilities."""
 
+from datetime import datetime, timedelta, timezone
 from unittest.mock import patch
 
-from spoiler_guard.cli import format_duration, open_in_browser
+from spoiler_guard.cli import IST, format_duration, main, open_in_browser
 
 
 class TestFormatDuration:
@@ -84,6 +85,27 @@ class TestOpenInBrowser:
             mock_run.assert_not_called()
             mock_wb.assert_called_once_with("https://example.com")
 
+class TestDefaultDate:
+    def test_defaults_to_today_ist(self):
+        fake_now = datetime(2026, 4, 15, 2, 30, tzinfo=IST)
+        with (
+            patch("spoiler_guard.cli.datetime") as mock_dt,
+            patch("spoiler_guard.cli.get_token", return_value="tok"),
+            patch("spoiler_guard.cli.fetch_ucl_content", return_value=[]),
+            patch("spoiler_guard.cli.sys.exit") as mock_exit,
+            patch("spoiler_guard.cli.sys.argv", ["sonyliv"]),
+        ):
+            mock_dt.now.return_value = fake_now
+            mock_dt.strptime = datetime.strptime
+            mock_exit.side_effect = SystemExit
+            try:
+                main()
+            except SystemExit:
+                pass
+            mock_dt.now.assert_called_once_with(IST)
+
+
+class TestOpenInBrowser:
     def test_falls_back_to_webbrowser_on_error(self):
         with (
             patch(

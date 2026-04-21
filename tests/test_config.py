@@ -1,6 +1,5 @@
 """Tests for configuration loading."""
 
-import tomllib
 from pathlib import Path
 from unittest.mock import mock_open, patch
 
@@ -64,3 +63,29 @@ name = "Safari"
         assert "season" in _DEFAULTS["sonyliv"]
         assert "preferences" in _DEFAULTS
         assert "favourite_teams" in _DEFAULTS["preferences"]
+        assert "hotstar" in _DEFAULTS
+        assert "tray_id" in _DEFAULTS["hotstar"]
+        assert "user_token" in _DEFAULTS["hotstar"]
+
+    def test_hotstar_defaults(self):
+        with patch("spoiler_guard.config._find_config_path", return_value=None):
+            config = load_config()
+
+        assert config["hotstar"]["tray_id"] == "1271442198"
+        assert config["hotstar"]["user_token"] == ""
+
+    def test_overrides_hotstar_config(self):
+        toml_content = b"""
+[hotstar]
+tray_id = "9999999999"
+user_token = "my-secret-token"
+"""
+        fake_path = Path("/fake/config.toml")
+        with (
+            patch("spoiler_guard.config._find_config_path", return_value=fake_path),
+            patch("builtins.open", mock_open(read_data=toml_content)),
+        ):
+            config = load_config()
+
+        assert config["hotstar"]["tray_id"] == "9999999999"
+        assert config["hotstar"]["user_token"] == "my-secret-token"

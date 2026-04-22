@@ -22,8 +22,10 @@
   const isHotstarSports = isHotstar && window.location.pathname.includes("/sports/");
   if (isHotstar && !isHotstarSports) return;
 
-  // Hotstar sports: add marker class to hide seekbar/time via CSS
-  if (isHotstarSports) {
+  // Hotstar football: add marker class to hide seekbar/time via CSS
+  // Only football — cricket highlights are short and don't spoil results
+  const isHotstarFootball = isHotstarSports && window.location.pathname.includes("/football/");
+  if (isHotstarFootball) {
     document.documentElement.classList.add("sg-hotstar-sports");
   }
 
@@ -60,7 +62,7 @@
   };
 
   const hideTimeDisplay = () => {
-    if (!isHotstarSports) return;
+    if (!isHotstarFootball) return;
 
     // Hide spans showing elapsed/remaining time (e.g. "01:24", "2:55:00")
     const spans = document.querySelectorAll("span");

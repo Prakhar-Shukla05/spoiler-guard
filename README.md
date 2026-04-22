@@ -1,6 +1,6 @@
 # spoiler-guard
 
-Spoiler-free sports highlights launcher for [SonyLiv](https://www.sonyliv.com/) (Champions League) and [Hotstar](https://www.hotstar.com/) (Premier League).
+Spoiler-free sports highlights launcher for [SonyLiv](https://www.sonyliv.com/) (Champions League) and [Hotstar](https://www.hotstar.com/) (Premier League, IPL).
 
 Both platforms spoil match results through thumbnails and titles before you can watch. This tool queries their APIs, presents matches with just team names (no scores, no thumbnails), and opens your selection directly in your browser — so you never see the result.
 
@@ -25,6 +25,14 @@ Both platforms spoil match results through thumbnails and titles before you can 
 5. Two-level selection: pick a match, then choose between highlights and full match replay
 6. Opens your selection in the configured browser
 
+### Hotstar (IPL)
+
+1. Authenticates with Hotstar's API using your `userUP` cookie
+2. Fetches IPL highlights from the editorial tray, filtered to full match highlights only (no innings highlights)
+3. Filters to the last 2 days (today + yesterday IST)
+4. Displays a spoiler-free match list with team abbreviations and duration
+5. Single-step selection: pick a match and it opens directly
+
 ## Setup
 
 Requires [uv](https://docs.astral.sh/uv/). Works on macOS, Windows, and Linux.
@@ -38,7 +46,7 @@ uv sync
 
 ### Hotstar authentication
 
-Hotstar requires your `userUP` cookie for API access:
+Hotstar requires your `userUP` cookie for API access (used by both PL and IPL):
 
 1. Open [hotstar.com](https://www.hotstar.com/) in your browser and log in
 2. Open DevTools (F12) → Application → Cookies → `hotstar.com`
@@ -49,7 +57,7 @@ SonyLiv requires no authentication — it uses anonymous API tokens.
 
 ### Browser extension (optional, recommended)
 
-The included browser extension hides spoiler thumbnails, match scores in titles, and the seekbar/time display on sports pages. It works on both SonyLiv and Hotstar.
+The included browser extension hides spoiler thumbnails, match scores in titles, and the seekbar/time display on football pages. It works on both SonyLiv and Hotstar.
 
 **Chrome / Edge / Arc / Brave / Opera:**
 
@@ -67,11 +75,14 @@ The included browser extension hides spoiler thumbnails, match scores in titles,
 
 ## Usage
 
-### SonyLiv
+### Champions League
 
 ```
-$ uv run sonyliv --date 2026-04-09
+$ uv run ucl --date 2026-04-09
 Looking for UCL matches on 09 Apr 2026...
+
+  Fetching API token...
+  Searching page 1/10... 47 new items
 
 Found 2 match(es):
 
@@ -82,10 +93,10 @@ Pick a match (number, 'a' for all, 'q' to quit): 1
   Opening: PSG vs Liverpool
 ```
 
-### Hotstar
+### Premier League
 
 ```
-$ uv run hotstar
+$ uv run pl
 Looking for PL matches (20 Apr – 21 Apr 2026)...
 
 Found 4 match(es), fetching highlights...
@@ -105,11 +116,29 @@ Pick a match (number, 'a' for all, 'q' to quit): 1
   Opening: Manchester City vs Arsenal — Full Match Replay
 ```
 
+### IPL
+
+```
+$ uv run ipl
+Looking for IPL matches (21 Apr – 22 Apr 2026)...
+
+Found 1 match(es):
+
+  1. SRH vs DC — Highlights (15m 16s)
+
+Pick a match (number, 'a' for all, 'q' to quit): 1
+  Opening: SRH vs DC
+```
+
 ### Options
 
-| Flag | Description | Default |
-|------|-------------|---------|
-| `--date YYYY-MM-DD` | Match date to look up | Today (IST) for SonyLiv; today + yesterday for Hotstar |
+| Command | Tournament | Platform | Default date range |
+|---------|-----------|----------|-------------------|
+| `uv run ucl` | Champions League | SonyLiv | Today (IST) |
+| `uv run pl` | Premier League | Hotstar | Today + yesterday (IST) |
+| `uv run ipl` | IPL | Hotstar | Today + yesterday (IST) |
+
+All commands accept `--date YYYY-MM-DD` to look up a specific date.
 
 ## Configuration
 
@@ -130,8 +159,9 @@ season = "2025-26"
 favourite_teams = ["chelsea"]
 
 [hotstar]
-tray_id = "1271442198"
-user_token = ""  # Your Hotstar userUP cookie value
+tray_id = "1271442198"       # PL replays tray
+ipl_tray_id = "1271615359"   # IPL highlights tray
+user_token = ""               # Your Hotstar userUP cookie value
 ```
 
 ## Project structure
@@ -149,18 +179,21 @@ browser-extension/
     overlay.css    # → symlink to chrome/overlay.css
 src/spoiler_guard/
   __init__.py
-  common.py      # Shared utilities (IST, format_duration, open_in_browser)
-  config.py      # Loads config.toml, provides module-level constants
-  api.py         # SonyLiv API client (token, content listing)
-  match.py       # SonyLiv match parsing, content selection, URL building
-  cli.py         # SonyLiv CLI entry point (uv run sonyliv)
+  common.py          # Shared utilities (IST, format_duration, open_in_browser)
+  config.py          # Loads config.toml, provides module-level constants
+  sonyliv_api.py     # SonyLiv API client (token, content listing)
+  sonyliv_match.py   # SonyLiv match parsing, content selection, URL building
+  sonyliv_cli.py     # UCL CLI entry point (uv run ucl)
   hotstar_api.py     # Hotstar API client (HMAC auth, tray/match fetching)
-  hotstar_match.py   # Hotstar match parsing, score stripping, grouping
-  hotstar_cli.py     # Hotstar CLI entry point (uv run hotstar)
+  hotstar_match.py   # PL match parsing, score stripping, grouping
+  hotstar_cli.py     # PL CLI entry point (uv run pl)
+  ipl_match.py       # IPL match parsing and grouping
+  ipl_cli.py         # IPL CLI entry point (uv run ipl)
 tests/
   test_common.py, test_config.py
-  test_api.py, test_match.py, test_cli.py
+  test_sonyliv_api.py, test_sonyliv_match.py, test_sonyliv_cli.py
   test_hotstar_api.py, test_hotstar_match.py, test_hotstar_cli.py
+  test_ipl_match.py, test_ipl_cli.py
 ```
 
 ## Requirements
@@ -178,8 +211,13 @@ tests/
 - Season-specific: update `tournament_id` and `season` in `config.toml` when a new UCL season starts.
 - SonyLiv briefly flashes the match thumbnail while the video buffers — install the browser extension to hide it.
 
-### Hotstar
+### Hotstar (PL)
 - Requires a valid `userUP` cookie which expires periodically — you'll need to re-copy it from DevTools when it does.
 - Hotstar's client-side router rewrites the URL to include the match score (e.g. `/crystal-palace-0-0-west-ham/`). The extension hides the score on the page itself, but the address bar may still show it.
 - The replay tray only contains recent matches. Older content may not be available.
 - Season-specific: update `tray_id` in `config.toml` when a new PL season starts.
+
+### Hotstar (IPL)
+- Same `userUP` cookie requirement as PL.
+- Only full match highlights are shown (innings highlights are filtered out).
+- Season-specific: update `ipl_tray_id` in `config.toml` when a new IPL season starts.

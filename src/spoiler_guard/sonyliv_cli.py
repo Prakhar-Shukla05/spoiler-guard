@@ -39,6 +39,7 @@ def main():
     print(f"Looking for UCL matches on {target_date.strftime('%d %b %Y')}...\n")
 
     # Get anonymous API token
+    print("  Fetching API token...", flush=True)
     try:
         token = get_token()
     except Exception as e:
@@ -60,6 +61,7 @@ def main():
     try:
         for page in range(MAX_PAGES):
             offset = page * PAGE_SIZE
+            print(f"  Searching page {page + 1}/{MAX_PAGES}...", end="", flush=True)
             highlights = fetch_ucl_content(
                 token, subtype="HIGHLIGHTS", count=PAGE_SIZE, offset=offset,
             )
@@ -75,9 +77,13 @@ def main():
                     combined.append(item)
                     new_items += 1
 
+            print(f" {new_items} new items", flush=True)
             matches = find_matches(combined, target_date)
 
-            if matches or new_items == 0:
+            if matches:
+                break
+            if new_items == 0:
+                print("  No more content available.")
                 break
 
     except Exception as e:

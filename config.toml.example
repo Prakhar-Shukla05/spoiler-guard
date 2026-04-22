@@ -26,6 +26,9 @@ favourite_teams = ["chelsea"]
 # Update this when a new season starts.
 tray_id = "1271442198"
 
+# Hotstar tray ID for IPL 2026 highlights.
+ipl_tray_id = "1271615359"
+
 # Your Hotstar userUP cookie value. Required for API access.
 # To find it: open hotstar.com in your browser, log in, open DevTools (F12),
 # go to Application > Cookies > hotstar.com, copy the value of "userUP".

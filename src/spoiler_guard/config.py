@@ -23,6 +23,7 @@ _DEFAULTS = {
     },
     "hotstar": {
         "tray_id": "1271442198",
+        "ipl_tray_id": "1271615359",
         "user_token": "",
     },
 }
@@ -79,4 +80,5 @@ FAVOURITE_TEAMS = _config["preferences"]["favourite_teams"]
 
 # Hotstar
 HOTSTAR_TRAY_ID = _config["hotstar"]["tray_id"]
+HOTSTAR_IPL_TRAY_ID = _config["hotstar"]["ipl_tray_id"]
 HOTSTAR_USER_TOKEN = _config["hotstar"]["user_token"]

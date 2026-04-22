@@ -4,7 +4,7 @@ import json
 from unittest.mock import MagicMock, patch
 from urllib.request import Request
 
-from spoiler_guard.api import (
+from spoiler_guard.sonyliv_api import (
     API_BASE,
     api_get,
     fetch_ucl_content,
@@ -25,7 +25,7 @@ def _mock_urlopen(response_data):
 class TestApiGet:
     def test_builds_url_without_params(self):
         mock_resp = _mock_urlopen({"ok": True})
-        with patch("spoiler_guard.api.urlopen", return_value=mock_resp) as mock_open:
+        with patch("spoiler_guard.sonyliv_api.urlopen", return_value=mock_resp) as mock_open:
             result = api_get("1.4/A/ENG/WEB/ALL/GETTOKEN")
 
             called_req = mock_open.call_args[0][0]
@@ -35,7 +35,7 @@ class TestApiGet:
 
     def test_builds_url_with_params(self):
         mock_resp = _mock_urlopen({"items": []})
-        with patch("spoiler_guard.api.urlopen", return_value=mock_resp) as mock_open:
+        with patch("spoiler_guard.sonyliv_api.urlopen", return_value=mock_resp) as mock_open:
             api_get("1.4/R/ENG/WEB/IN/TRAY/SEARCH/VOD", params={"from": "0", "to": "9"})
 
             called_req = mock_open.call_args[0][0]
@@ -44,7 +44,7 @@ class TestApiGet:
 
     def test_includes_security_token_header(self):
         mock_resp = _mock_urlopen({})
-        with patch("spoiler_guard.api.urlopen", return_value=mock_resp) as mock_open:
+        with patch("spoiler_guard.sonyliv_api.urlopen", return_value=mock_resp) as mock_open:
             api_get("some/path", token="my-jwt-token")
 
             called_req = mock_open.call_args[0][0]
@@ -52,7 +52,7 @@ class TestApiGet:
 
     def test_omits_security_token_when_none(self):
         mock_resp = _mock_urlopen({})
-        with patch("spoiler_guard.api.urlopen", return_value=mock_resp) as mock_open:
+        with patch("spoiler_guard.sonyliv_api.urlopen", return_value=mock_resp) as mock_open:
             api_get("some/path")
 
             called_req = mock_open.call_args[0][0]
@@ -62,7 +62,7 @@ class TestApiGet:
 class TestGetToken:
     def test_returns_result_obj(self):
         mock_resp = _mock_urlopen({"resultObj": "fake-jwt-token-123"})
-        with patch("spoiler_guard.api.urlopen", return_value=mock_resp):
+        with patch("spoiler_guard.sonyliv_api.urlopen", return_value=mock_resp):
             token = get_token()
             assert token == "fake-jwt-token-123"
 
@@ -75,14 +75,14 @@ class TestFetchUclContent:
                 "containers": [{"id": 123, "metadata": {"episodeTitle": "Test"}}],
             }
         })
-        with patch("spoiler_guard.api.urlopen", return_value=mock_resp):
+        with patch("spoiler_guard.sonyliv_api.urlopen", return_value=mock_resp):
             items = fetch_ucl_content("token123")
             assert len(items) == 1
             assert items[0]["id"] == 123
 
     def test_includes_subtype_filter_when_provided(self):
         mock_resp = _mock_urlopen({"resultObj": {"containers": []}})
-        with patch("spoiler_guard.api.urlopen", return_value=mock_resp) as mock_open:
+        with patch("spoiler_guard.sonyliv_api.urlopen", return_value=mock_resp) as mock_open:
             fetch_ucl_content("token", subtype="HIGHLIGHTS")
 
             called_req = mock_open.call_args[0][0]
@@ -90,7 +90,7 @@ class TestFetchUclContent:
 
     def test_omits_subtype_filter_when_none(self):
         mock_resp = _mock_urlopen({"resultObj": {"containers": []}})
-        with patch("spoiler_guard.api.urlopen", return_value=mock_resp) as mock_open:
+        with patch("spoiler_guard.sonyliv_api.urlopen", return_value=mock_resp) as mock_open:
             fetch_ucl_content("token", subtype=None)
 
             called_req = mock_open.call_args[0][0]
@@ -98,7 +98,7 @@ class TestFetchUclContent:
 
     def test_caps_count_at_50(self):
         mock_resp = _mock_urlopen({"resultObj": {"containers": []}})
-        with patch("spoiler_guard.api.urlopen", return_value=mock_resp) as mock_open:
+        with patch("spoiler_guard.sonyliv_api.urlopen", return_value=mock_resp) as mock_open:
             fetch_ucl_content("token", count=100)
 
             called_req = mock_open.call_args[0][0]
@@ -106,7 +106,7 @@ class TestFetchUclContent:
 
     def test_includes_tournament_id(self):
         mock_resp = _mock_urlopen({"resultObj": {"containers": []}})
-        with patch("spoiler_guard.api.urlopen", return_value=mock_resp) as mock_open:
+        with patch("spoiler_guard.sonyliv_api.urlopen", return_value=mock_resp) as mock_open:
             fetch_ucl_content("token")
 
             called_req = mock_open.call_args[0][0]
@@ -114,7 +114,7 @@ class TestFetchUclContent:
 
     def test_passes_offset_to_from_and_to(self):
         mock_resp = _mock_urlopen({"resultObj": {"containers": []}})
-        with patch("spoiler_guard.api.urlopen", return_value=mock_resp) as mock_open:
+        with patch("spoiler_guard.sonyliv_api.urlopen", return_value=mock_resp) as mock_open:
             fetch_ucl_content("token", count=50, offset=100)
 
             called_req = mock_open.call_args[0][0]
@@ -123,6 +123,6 @@ class TestFetchUclContent:
 
     def test_returns_empty_list_on_missing_containers(self):
         mock_resp = _mock_urlopen({"resultObj": {}})
-        with patch("spoiler_guard.api.urlopen", return_value=mock_resp):
+        with patch("spoiler_guard.sonyliv_api.urlopen", return_value=mock_resp):
             items = fetch_ucl_content("token")
             assert items == []

@@ -4,9 +4,9 @@ import argparse
 import sys
 from datetime import datetime
 
-from .api import fetch_ucl_content, get_token
+from .sonyliv_api import fetch_ucl_content, get_token
 from .common import IST, TYPE_LABELS, format_duration, open_in_browser
-from .match import (
+from .sonyliv_match import (
     build_url,
     find_matches,
     is_favourite_team_match,

@@ -63,7 +63,7 @@ def main():
 
     if not match_list:
         print("No PL matches found for this date range.")
-        print("Try a different date with: hotstar --date YYYY-MM-DD")
+        print("Try a different date with: pl --date YYYY-MM-DD")
         sys.exit(0)
 
     # Fetch highlights for each match

@@ -94,7 +94,7 @@ def main():
 
     if not match_list:
         print("No UCL highlights found for this date.")
-        print("Try a different date with: sonyliv --date YYYY-MM-DD")
+        print("Try a different date with: ucl --date YYYY-MM-DD")
         sys.exit(0)
 
     # Display matches — spoiler-free, just team names

@@ -1,15 +1,15 @@
 [project]
 name = "spoiler-guard"
 version = "0.1.0"
-description = "Spoiler-free Champions League highlights launcher for SonyLiv"
+description = "Spoiler-free sports highlights launcher for SonyLiv and Hotstar"
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.13"
 dependencies = []
 
 [project.scripts]
-sonyliv = "spoiler_guard.cli:main"
-hotstar = "spoiler_guard.hotstar_cli:main"
+ucl = "spoiler_guard.cli:main"
+pl = "spoiler_guard.hotstar_cli:main"
 ipl = "spoiler_guard.ipl_cli:main"
 
 [build-system]
